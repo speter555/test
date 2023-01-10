@@ -100,13 +100,14 @@ jobs:
         id: preset
         shell: bash
         run: |
-          mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml  release:prepare -DdryRun=true
-
+          echo "mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml  release:prepare -DdryRun=true"
+          echo "scm.tag=test-0.3.0" >> release.properties
+          
           SCM_TAG=`cat release.properties | grep -w "scm.tag" | cut -d'=' -f2`
           echo "SCM_TAG=${SCM_TAG}" 
           echo "SCM_TAG=${SCM_TAG}" >> $GITHUB_OUTPUT
           
-          mvn -B release:clean --file pom.xml
+          echo "mvn -B release:clean --file pom.xml"
           
           RELEASE_BRANCH_NAME=release/${SCM_TAG%.*}.x
           echo "RELEASE_BRANCH_NAME=${RELEASE_BRANCH_NAME}"
@@ -135,7 +136,7 @@ jobs:
           NEXT_MASTER_VERSION=$(echo  ${{steps.preset.outputs.SCM_TAG}} |  awk -F'.' '{print $1"."$2+1"."0}' |  sed s/[.]$//)
           TARGET_BRANCH_NEXT_VERSION=$(echo $NEXT_MASTER_VERSION | rev | cut -d '-' -f1 | rev)-SNAPSHOT
           echo next master branch version is $TARGET_BRANCH_NEXT_VERSION
-          mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml release:update-versions -DdevelopmentVersion=$TARGET_BRANCH_NEXT_VERSION
+          mvn -B release:update-versions -DdevelopmentVersion=$TARGET_BRANCH_NEXT_VERSION
           
           COMMIT_MESSAGE="Bump version to $TARGET_BRANCH_NEXT_VERSION"
           echo "COMMIT_MESSAGE=$COMMIT_MESSAGE"
