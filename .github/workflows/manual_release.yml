@@ -100,9 +100,9 @@ jobs:
         id: preset
         run: |
           mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml  release:prepare -DdryRun=true -Dgpg.keyname=$GPG_KEY_ID_GITHUB_TECHUSER
-          SCM_TAG=`cat release.properties | grep -w "scm.tag" | cut -d'=' -f2`
+          echo SCM_TAG=`cat release.properties | grep -w "scm.tag" | cut -d'=' -f2`
           mvn -B release:clean --file pom.xml
-          RELEASE_BRANCH_NAME=release/${SCM_TAG%.*}.x
+          echo RELEASE_BRANCH_NAME=release/${SCM_TAG%.*}.x
           git checkout -b $RELEASE_BRANCH_NAME origin/main
           git push --set-upstream origin $RELEASE_BRANCH_NAME
           echo new release branch name is $RELEASE_BRANCH_NAME
@@ -127,15 +127,15 @@ jobs:
         env:
           SCM_TAG: ${{ steps.preset.outputs.SCM_TAG }}
         run: |
-          MR_BRANCH_NAME=feature/$SCM_TAG-release
-          NEW_BRANCH_NAME=$MR_BRANCH_NAME
+          echo MR_BRANCH_NAME=feature/$SCM_TAG-release
+          echo NEW_BRANCH_NAME=$MR_BRANCH_NAME
           git checkout -b $NEW_BRANCH_NAME origin/main
-          NEXT_MASTER_VERSION=$(echo ${SCM_TAG} |  awk -F'.' '{print $1"."$2+1"."0}' |  sed s/[.]$//)
-          TARGET_BRANCH_NEXT_VERSION=$(echo ${NEXT_MASTER_VERSION} | rev | cut -d '-' -f1 | rev)-SNAPSHOT
+          echo NEXT_MASTER_VERSION=$(echo ${SCM_TAG} |  awk -F'.' '{print $1"."$2+1"."0}' |  sed s/[.]$//)
+          echo TARGET_BRANCH_NEXT_VERSION=$(echo ${NEXT_MASTER_VERSION} | rev | cut -d '-' -f1 | rev)-SNAPSHOT
           echo next master branch version is $TARGET_BRANCH_NEXT_VERSION
           mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml release:update-versions -DdevelopmentVersion=$TARGET_BRANCH_NEXT_VERSION
-          COMMIT_MESSAGE="Bump version to $TARGET_BRANCH_NEXT_VERSION"
-          BRANCH_NAME=$MR_BRANCH_NAME
+          echo COMMIT_MESSAGE="Bump version to $TARGET_BRANCH_NEXT_VERSION"
+          echo BRANCH_NAME=$MR_BRANCH_NAME
           git commit -a -m "${COMMIT_MESSAGE}"
           git push origin $BRANCH_NAME
           echo next version on main is $TARGET_BRANCH_NEXT_VERSION
