@@ -106,15 +106,7 @@ jobs:
           mvn -B release:clean --file pom.xml
           echo RELEASE_BRANCH_NAME=release/${SCM_TAG%.*}.x
           git checkout -b $RELEASE_BRANCH_NAME origin/main
-          git push --set-upstream origin $RELEASE_BRANCH_NAME
           echo new release branch name is $RELEASE_BRANCH_NAME
-
-      - name: Checkout RELEASE BRANCH
-        uses: actions/checkout@v3
-        with:
-          # Ne az a user legyen aki a workflow-ot inditotta
-          token: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
-          ref: ${{ steps.preset.outputs.RELEASE_BRANCH_NAME }}
 
   #    - name: Maven release PREPARE
   #      run: |
@@ -126,6 +118,7 @@ jobs:
 
       - name: Bump version branch
         id: bumpbranch
+        shell: bash
         env:
           SCM_TAG: ${{ steps.preset.outputs.SCM_TAG }}
         run: |
@@ -139,7 +132,7 @@ jobs:
           echo COMMIT_MESSAGE="Bump version to $TARGET_BRANCH_NEXT_VERSION"
           echo BRANCH_NAME=$MR_BRANCH_NAME
           git commit -a -m "${COMMIT_MESSAGE}"
-          git push origin $BRANCH_NAME
+          git push $BRANCH_NAME
           echo next version on main is $TARGET_BRANCH_NEXT_VERSION
 
       - name: Create Pull Request
