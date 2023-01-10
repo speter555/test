@@ -98,6 +98,7 @@ jobs:
 
       - name: Maven release prepare DryRun and release branch
         id: preset
+        shell: bash
         run: |
           mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml  release:prepare -DdryRun=true
 
@@ -122,6 +123,7 @@ jobs:
 
       - name: Bump version branch
         id: bumpbranch
+        shell: bash
         run: |
           MR_BRANCH_NAME=feature/${{needs.release_job.outputs.SCM_TAG}}-release
           echo "MR_BRANCH_NAME=${MR_BRANCH_NAME}" >> $GITHUB_OUTPUT
