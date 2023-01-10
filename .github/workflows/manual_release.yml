@@ -106,12 +106,12 @@ jobs:
           git push --set-upstream origin $RELEASE_BRANCH_NAME
           echo new release branch name is $RELEASE_BRANCH_NAME
 
-      - name: Checkout $RELEASE_BRANCH_NAME
+      - name: Checkout ${RELEASE_BRANCH_NAME}
         uses: actions/checkout@v3
         with:
           # Ne az a user legyen aki a workflow-ot inditotta
           token: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
-          ref: $RELEASE_BRANCH_NAME
+          ref: ${RELEASE_BRANCH_NAME}
 
   #    - name: Maven release PREPARE
   #      run: |
@@ -140,12 +140,12 @@ jobs:
         uses: peter-evans/create-pull-request@v4
         with:
           token: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
-          commit-message: $COMMIT_MESSAGE
+          commit-message: ${COMMIT_MESSAGE}
           committer: innovitech-robot
           author: innovitech-robot
-          branch: $BRANCH_NAME
+          branch: ${BRANCH_NAME}
           delete-branch: true
-          title: $COMMIT_MESSAGE
+          title: ${COMMIT_MESSAGE}
 
       - name: Check pull request's data
         if: ${{ steps.cpr.outputs.pull-request-number }}
