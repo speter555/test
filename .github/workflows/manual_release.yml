@@ -114,6 +114,8 @@ jobs:
           echo "RELEASE_BRANCH_NAME=${RELEASE_BRANCH_NAME}" >> $GITHUB_OUTPUT
           
           git checkout -b ${RELEASE_BRANCH_NAME} main
+          git push --set-upstream origin ${RELEASE_BRANCH_NAME}
+          
           echo new release branch name is ${RELEASE_BRANCH_NAME}
           MR_BRANCH_NAME=feature/${SCM_TAG}-release
           echo "MR_BRANCH_NAME=${MR_BRANCH_NAME}"
