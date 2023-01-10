@@ -122,7 +122,7 @@ jobs:
         env:
           SCM_TAG: ${{ steps.preset.outputs.SCM_TAG }}
         run: |
-          echo MR_BRANCH_NAME=feature/$SCM_TAG-release
+          echo MR_BRANCH_NAME=feature/${SCM_TAG}-release
           echo NEW_BRANCH_NAME=$MR_BRANCH_NAME
           git checkout -b $NEW_BRANCH_NAME origin/main
           echo NEXT_MASTER_VERSION=$(echo ${SCM_TAG} |  awk -F'.' '{print $1"."$2+1"."0}' |  sed s/[.]$//)
