@@ -144,7 +144,7 @@ jobs:
         id: createbumpbranch
         shell: bash
         run: |
-          git branch ${{steps.preset.outputs.MR_BRANCH_NAME}} main
+          git checkout -b ${{steps.preset.outputs.MR_BRANCH_NAME}} main
           git push --set-upstream origin ${{steps.preset.outputs.MR_BRANCH_NAME}}
 
       - name: Checkout bump version branch
