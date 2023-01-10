@@ -126,25 +126,12 @@ jobs:
   #    - name: Maven release PERFORM
       #      run: mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml  release:perform
 
-
       - name: Bump version branch
         id: bumpbranch
         shell: bash
         run: |
-          git branch ${{steps.preset.preset.MR_BRANCH_NAME}} main
+          git branch ${{steps.preset.outputs.MR_BRANCH_NAME}} main
           git push
-
-      - name: Checkout main
-        uses: actions/checkout@v3
-        with:
-          # Ne az a user legyen aki a workflow-ot inditotta
-          token: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
-          branch: '${{steps.preset.preset.MR_BRANCH_NAME}}'
-
-      - name: Bump version branch
-        id: bumpbranch
-        shell: bash
-        run: |  
           NEXT_MASTER_VERSION=$(echo  ${{steps.preset.outputs.SCM_TAG}} |  awk -F'.' '{print $1"."$2+1"."0}' |  sed s/[.]$//)
           TARGET_BRANCH_NEXT_VERSION=$(echo $NEXT_MASTER_VERSION | rev | cut -d '-' -f1 | rev)-SNAPSHOT
           echo next master branch version is $TARGET_BRANCH_NEXT_VERSION
