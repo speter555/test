@@ -129,6 +129,21 @@ jobs:
   #    - name: Maven release PERFORM
       #      run: mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml  release:perform
 
+
+      - name: Bump version branch
+        id: createbumpbranch
+        shell: bash
+        run: |
+          git branch ${{steps.preset.outputs.MR_BRANCH_NAME}} main
+          git push --set-upstream origin ${{steps.preset.outputs.MR_BRANCH_NAME}}
+
+      - name: Checkout main
+        uses: actions/checkout@v3
+        with:
+          # Ne az a user legyen aki a workflow-ot inditotta
+          token: ${{steps.preset.outputs.MR_BRANCH_NAME}}
+          ref: main
+
       - name: Bump version branch
         id: bumpbranch
         shell: bash
@@ -154,8 +169,10 @@ jobs:
         uses: peter-evans/create-pull-request@v4
         with:
           token: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
-          commit-message: ${{steps.preset.bumpbranch.COMMIT_MESSAGE}}
-          branch:  ${{steps.preset.preset.MR_BRANCH_NAME}}
+          commit-message: ${{steps.preset.outputs.COMMIT_MESSAGE}}
+          branch:  ${{steps.preset.outputs.MR_BRANCH_NAME}}
           delete-branch: true
-          title: ${{steps.preset.bumpbranch.COMMIT_MESSAGE}}
-
+          title: ${{steps.preset.outputs.COMMIT_MESSAGE}}
+          committer: InnovITech Kft. - Github technical user <github-techuser@innovitech.hu>
+          author: InnovITech Kft. - Github technical user <github-techuser@innovitech.hu>
+          base: main
