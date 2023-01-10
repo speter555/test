@@ -17,8 +17,7 @@ on:
         required: true
 
 env:
-  MAVEN_SETTINGS: '-s $GITHUB_WORKSPACE/.github/.m2/settings.xml'
-  MAVEN_CLI: '-B $MAVEN_SETTINGS'
+  MAVEN_CLI: '-B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml'
   MAVEN_PROFILE: "-Pparent-pom-release"
   NEXUS_USER: '${{ secrets.NEXUS_USER }}'
   NEXUS_PASSWORD: '${{ secrets.NEXUS_PASSWORD }}'
