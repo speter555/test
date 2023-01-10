@@ -155,8 +155,6 @@ jobs:
         with:
           token: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
           commit-message: ${{steps.preset.bumpbranch.COMMIT_MESSAGE}}
-          committer: innovitech-robot
-          author: innovitech-robot
           branch:  ${{steps.preset.preset.MR_BRANCH_NAME}}
           delete-branch: true
           title: ${{steps.preset.bumpbranch.COMMIT_MESSAGE}}
