@@ -126,6 +126,14 @@ jobs:
   #    - name: Maven release PERFORM
       #      run: mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml  release:perform
 
+
+      - name: Bump version branch
+        id: bumpbranch
+        shell: bash
+        run: |
+          git branch ${{steps.preset.preset.MR_BRANCH_NAME}} main
+          git push
+
       - name: Checkout main
         uses: actions/checkout@v3
         with:
