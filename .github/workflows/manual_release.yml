@@ -103,15 +103,17 @@ jobs:
           mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml  release:prepare -DdryRun=true
 
           SCM_TAG=`cat release.properties | grep -w "scm.tag" | cut -d'=' -f2`
+          echo "SCM_TAG=${SCM_TAG}" 
           echo "SCM_TAG=${SCM_TAG}" >> $GITHUB_OUTPUT
           
           mvn -B release:clean --file pom.xml
           
           echo RELEASE_BRANCH_NAME=release/${SCM_TAG%.*}.x
+          echo "RELEASE_BRANCH_NAME=${RELEASE_BRANCH_NAME}"
           echo "RELEASE_BRANCH_NAME=${RELEASE_BRANCH_NAME}" >> $GITHUB_OUTPUT
           
-          git checkout -b $RELEASE_BRANCH_NAME origin/main
-          echo new release branch name is $RELEASE_BRANCH_NAME
+          git checkout -b ${RELEASE_BRANCH_NAME} main
+          echo new release branch name is ${RELEASE_BRANCH_NAME}
 
   #    - name: Maven release PREPARE
   #      run: |
@@ -126,6 +128,7 @@ jobs:
         shell: bash
         run: |
           MR_BRANCH_NAME=feature/${{needs.release_job.outputs.SCM_TAG}}-release
+          echo "MR_BRANCH_NAME=${MR_BRANCH_NAME}"
           echo "MR_BRANCH_NAME=${MR_BRANCH_NAME}" >> $GITHUB_OUTPUT
           
           git checkout -b $MR_BRANCH_NAME origin/main
@@ -135,6 +138,7 @@ jobs:
           mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml release:update-versions -DdevelopmentVersion=$TARGET_BRANCH_NEXT_VERSION
           
           COMMIT_MESSAGE="Bump version to $TARGET_BRANCH_NEXT_VERSION"
+          echo "COMMIT_MESSAGE=$COMMIT_MESSAGE"
           echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_OUTPUT
           
           git commit -a -m "$COMMIT_MESSAGE"
