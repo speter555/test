@@ -108,7 +108,7 @@ jobs:
           
           mvn -B release:clean --file pom.xml
           
-          echo RELEASE_BRANCH_NAME=release/${SCM_TAG%.*}.x
+          RELEASE_BRANCH_NAME=release/${SCM_TAG%.*}.x
           echo "RELEASE_BRANCH_NAME=${RELEASE_BRANCH_NAME}"
           echo "RELEASE_BRANCH_NAME=${RELEASE_BRANCH_NAME}" >> $GITHUB_OUTPUT
           
