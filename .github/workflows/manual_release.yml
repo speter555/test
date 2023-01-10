@@ -100,37 +100,47 @@ jobs:
         id: preset
         shell: bash
         run: |
-          echo "mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml  release:prepare -DdryRun=true"
-          echo "scm.tag=test-0.3.0" >> release.properties
-          
+          mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml  release:prepare -DdryRun=true
+
           SCM_TAG=`cat release.properties | grep -w "scm.tag" | cut -d'=' -f2`
           echo "SCM_TAG=${SCM_TAG}" 
           echo "SCM_TAG=${SCM_TAG}" >> $GITHUB_OUTPUT
           
-          echo "mvn -B release:clean --file pom.xml"
+          mvn -B release:clean --file pom.xml
           
           RELEASE_BRANCH_NAME=release/${SCM_TAG%.*}.x
           echo "RELEASE_BRANCH_NAME=${RELEASE_BRANCH_NAME}"
           echo "RELEASE_BRANCH_NAME=${RELEASE_BRANCH_NAME}" >> $GITHUB_OUTPUT
-          
-          git checkout -b ${RELEASE_BRANCH_NAME} main
-          git push --set-upstream origin ${RELEASE_BRANCH_NAME}
-          
+                    
           echo new release branch name is ${RELEASE_BRANCH_NAME}
           MR_BRANCH_NAME=feature/${SCM_TAG}-release
           echo "MR_BRANCH_NAME=${MR_BRANCH_NAME}"
           echo "MR_BRANCH_NAME=${MR_BRANCH_NAME}" >> $GITHUB_OUTPUT
 
-  #    - name: Maven release PREPARE
-  #      run: |
-      #         mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml  release:prepare
-  #         git push origin ${{ steps.preset.outputs.RELEASE_BRANCH_NAME }}
+
+      - name: Create release branch
+        id: createreleasebranch
+        shell: bash
+        run: |
+          git checkout -b ${{steps.preset.outputs.RELEASE_BRANCH_NAME}} main
+          git push --set-upstream origin ${{steps.preset.outputs.RELEASE_BRANCH_NAME}}
+
+      - name: Checkout release branch
+        uses: actions/checkout@v3
+        with:
+          # Ne az a user legyen aki a workflow-ot inditotta
+          token: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
+          ref: ${{ steps.preset.outputs.RELEASE_BRANCH_NAME }}
+
+      - name: Maven release PREPARE
+        run: |
+          mvn -B release:prepare
   #
   #    - name: Maven release PERFORM
       #      run: mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml  release:perform
 
 
-      - name: Bump version branch
+      - name: Create bump version branch
         id: createbumpbranch
         shell: bash
         run: |
@@ -142,7 +152,7 @@ jobs:
         with:
           # Ne az a user legyen aki a workflow-ot inditotta
           token: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
-          ref: ${{steps.preset.outputs.MR_BRANCH_NAME}}
+          ref: ${{ steps.preset.outputs.MR_BRANCH_NAME }}
 
       - name: Bump version branch
         id: bumpbranch
