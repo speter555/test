@@ -97,47 +97,60 @@ jobs:
           cache: 'maven'
 
       - name: Maven release prepare DryRun and release branch
+        id: preset
         run: |
           mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml  release:prepare -DdryRun=true -Dgpg.keyname=$GPG_KEY_ID_GITHUB_TECHUSER
-          cat release.properties | grep -w "scm.tag" | cut -d'=' -f2 >> $SCM_TAG
+          SCM_TAG=`cat release.properties | grep -w "scm.tag" | cut -d'=' -f2`
           mvn -B release:clean --file pom.xml
-          echo release/${SCM_TAG%.*}.x >> $RELEASE_BRANCH_NAME
+          RELEASE_BRANCH_NAME=release/${SCM_TAG%.*}.x
           git checkout -b $RELEASE_BRANCH_NAME origin/main
           git push --set-upstream origin $RELEASE_BRANCH_NAME
           echo new release branch name is $RELEASE_BRANCH_NAME
 
+      - name: Checkout RELEASE BRANCH
+        uses: actions/checkout@v3
+        with:
+          # Ne az a user legyen aki a workflow-ot inditotta
+          token: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
+          ref: ${{ steps.preset.outputs.RELEASE_BRANCH_NAME }}
+
   #    - name: Maven release PREPARE
   #      run: |
       #         mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml  release:prepare
-  #         git push origin $RELEASE_BRANCH_NAME
+  #         git push origin ${{ steps.preset.RELEASE_BRANCH_NAME }}
   #
   #    - name: Maven release PERFORM
       #      run: mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml  release:perform
 
       - name: Bump version branch
+        id: bumpbranch
+        env:
+          SCM_TAG: ${{ steps.preset.outputs.SCM_TAG }}
         run: |
-          echo feature/$SCM_TAG-release >> $MR_BRANCH_NAME
-          echo $MR_BRANCH_NAME >> $NEW_BRANCH_NAME
-          $(echo ${SCM_TAG} |  awk -F'.' '{print $1"."$2+1"."0}' |  sed s/[.]$//) >> $NEXT_MASTER_VERSION
-          $(echo ${NEXT_MASTER_VERSION} | rev | cut -d '-' -f1 | rev)-SNAPSHOT >> $TARGET_BRANCH_NEXT_VERSION
+          MR_BRANCH_NAME=feature/$SCM_TAG-release
+          NEW_BRANCH_NAME=$MR_BRANCH_NAME
+          git checkout -b $NEW_BRANCH_NAME origin/main
+          NEXT_MASTER_VERSION=$(echo ${SCM_TAG} |  awk -F'.' '{print $1"."$2+1"."0}' |  sed s/[.]$//)
+          TARGET_BRANCH_NEXT_VERSION=$(echo ${NEXT_MASTER_VERSION} | rev | cut -d '-' -f1 | rev)-SNAPSHOT
           echo next master branch version is $TARGET_BRANCH_NEXT_VERSION
-          mvn -B release:update-versions -DdevelopmentVersion=$TARGET_BRANCH_NEXT_VERSION
-          echo "${CI_COMMIT_MESSAGE//" "*} bump version to $TARGET_BRANCH_NEXT_VERSION" >> $COMMIT_MESSAGE
-          echo $MR_BRANCH_NAME >> $BRANCH_NAME
+          mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml release:update-versions -DdevelopmentVersion=$TARGET_BRANCH_NEXT_VERSION
+          COMMIT_MESSAGE="Bump version to $TARGET_BRANCH_NEXT_VERSION"
+          BRANCH_NAME=$MR_BRANCH_NAME
           git commit -a -m "${COMMIT_MESSAGE}"
           git push origin $BRANCH_NAME
-          echo next version on $CI_DEFAULT_BRANCH is $TARGET_BRANCH_NEXT_VERSION
+          echo next version on main is $TARGET_BRANCH_NEXT_VERSION
 
       - name: Create Pull Request
+        id: cpr
         uses: peter-evans/create-pull-request@v4
         with:
           token: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
-          commit-message: ${COMMIT_MESSAGE}
+          commit-message: ${{ steps.bumpbranch.outputs.COMMIT_MESSAGE }}
           committer: innovitech-robot
           author: innovitech-robot
-          branch: ${BRANCH_NAME}
+          branch:  ${{ steps.bumpbranch.outputs.BRANCH_NAME }}
           delete-branch: true
-          title: ${COMMIT_MESSAGE}
+          title: ${{ steps.bumpbranch.outputs.COMMIT_MESSAGE }}
 
       - name: Check pull request's data
         if: ${{ steps.cpr.outputs.pull-request-number }}
