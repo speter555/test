@@ -17,12 +17,9 @@ on:
         required: true
 
 env:
-  MAVEN_CLI: '-B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml'
-  MAVEN_PROFILE: "-Pparent-pom-release"
   NEXUS_USER: '${{ secrets.NEXUS_USER }}'
   NEXUS_PASSWORD: '${{ secrets.NEXUS_PASSWORD }}'
   GPG_KEY_ID_GITHUB_TECHUSER: '${{ secrets.GPG_KEY_ID_GITHUB_TECHUSER }}'
-
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -101,7 +98,7 @@ jobs:
 
       - name: Maven release prepare DryRun and release branch
         run: |
-          mvn $MAVEN_CLI $MAVEN_PROFILE release:prepare -DdryRun=true -Dgpg.keyname=$GPG_KEY_ID_GITHUB_TECHUSER
+          mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml  release:prepare -DdryRun=true -Dgpg.keyname=$GPG_KEY_ID_GITHUB_TECHUSER
           SCM_TAG=`cat release.properties | grep -w "scm.tag" | cut -d'=' -f2`
           mvn -B release:clean --file pom.xml
           RELEASE_BRANCH_NAME=release/${SCM_TAG%.*}.x
@@ -118,11 +115,11 @@ jobs:
 
   #    - name: Maven release PREPARE
   #      run: |
-  #         mvn $MAVEN_CLI $MAVEN_PROFILE release:prepare
+      #         mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml  release:prepare
   #         git push origin $RELEASE_BRANCH_NAME
   #
   #    - name: Maven release PERFORM
-  #      run: mvn $MAVEN_CLI $MAVEN_PROFILE release:perform
+      #      run: mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml  release:perform
 
       - name: Bump version branch
         run: |
@@ -132,7 +129,7 @@ jobs:
           NEXT_MASTER_VERSION=$(echo ${SCM_TAG} |  awk -F'.' '{print $1"."$2+1"."0}' |  sed s/[.]$//)
           TARGET_BRANCH_NEXT_VERSION=$(echo ${NEXT_MASTER_VERSION} | rev | cut -d '-' -f1 | rev)-SNAPSHOT
           echo next master branch version is $TARGET_BRANCH_NEXT_VERSION
-          mvn $MAVEN_CLI release:update-versions -DdevelopmentVersion=$TARGET_BRANCH_NEXT_VERSION
+          mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml release:update-versions -DdevelopmentVersion=$TARGET_BRANCH_NEXT_VERSION
           COMMIT_MESSAGE="${CI_COMMIT_MESSAGE//" "*} bump version to $TARGET_BRANCH_NEXT_VERSION"
           BRANCH_NAME=$MR_BRANCH_NAME
           git commit -a -m "${COMMIT_MESSAGE}"
