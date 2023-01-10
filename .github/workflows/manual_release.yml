@@ -137,12 +137,12 @@ jobs:
           git branch ${{steps.preset.outputs.MR_BRANCH_NAME}} main
           git push --set-upstream origin ${{steps.preset.outputs.MR_BRANCH_NAME}}
 
-      - name: Checkout main
+      - name: Checkout bump version branch
         uses: actions/checkout@v3
         with:
           # Ne az a user legyen aki a workflow-ot inditotta
-          token: ${{steps.preset.outputs.MR_BRANCH_NAME}}
-          ref: main
+          token: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
+          ref: ${{steps.preset.outputs.MR_BRANCH_NAME}}
 
       - name: Bump version branch
         id: bumpbranch
