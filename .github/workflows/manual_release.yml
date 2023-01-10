@@ -92,15 +92,12 @@ jobs:
         with:
           java-version: 17
           distribution: 'temurin'
-          server-id: ossrh # Value of the distributionManagement/repository/id field of the pom.xml
-          settings-path: ${{ github.workspace }} # location for the settings.xml file
           cache: 'maven'
 
       - name: Maven release prepare DryRun and release branch
         id: preset
-        shell: bash
         run: |
-          mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml  release:prepare -DdryRun=true -Dgpg.keyname=$GPG_KEY_ID_GITHUB_TECHUSER
+          mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml  release:prepare -DdryRun=true
           SCM_TAG=`cat release.properties | grep -w "scm.tag" | cut -d'=' -f2`
           echo SCM_TAG=${SCM_TAG}
           mvn -B release:clean --file pom.xml
@@ -120,17 +117,16 @@ jobs:
         id: bumpbranch
         shell: bash
         run: |
-          echo MR_BRANCH_NAME=feature/ ${{ steps.preset.outputs.SCM_TAG }}-release
-          echo NEW_BRANCH_NAME=$MR_BRANCH_NAME
-          git checkout -b $NEW_BRANCH_NAME origin/main
-          echo NEXT_MASTER_VERSION=$(echo  ${{ steps.preset.outputs.SCM_TAG }} |  awk -F'.' '{print $1"."$2+1"."0}' |  sed s/[.]$//)
+          MR_BRANCH_NAME=feature/${steps.preset.outputs.SCM_TAG}-release
+          echo MR_BRANCH_NAME=$MR_BRANCH_NAME
+          git checkout -b $MR_BRANCH_NAME origin/main
+          echo NEXT_MASTER_VERSION=$(echo  ${steps.preset.outputs.SCM_TAG} |  awk -F'.' '{print $1"."$2+1"."0}' |  sed s/[.]$//)
           echo TARGET_BRANCH_NEXT_VERSION=$(echo ${NEXT_MASTER_VERSION} | rev | cut -d '-' -f1 | rev)-SNAPSHOT
           echo next master branch version is $TARGET_BRANCH_NEXT_VERSION
           mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml release:update-versions -DdevelopmentVersion=$TARGET_BRANCH_NEXT_VERSION
           echo COMMIT_MESSAGE="Bump version to $TARGET_BRANCH_NEXT_VERSION"
-          echo BRANCH_NAME=$MR_BRANCH_NAME
           git commit -a -m "${COMMIT_MESSAGE}"
-          git push $BRANCH_NAME
+          git push $MR_BRANCH_NAME
           echo next version on main is $TARGET_BRANCH_NEXT_VERSION
 
       - name: Create Pull Request
@@ -141,7 +137,7 @@ jobs:
           commit-message: ${{ steps.bumpbranch.outputs.COMMIT_MESSAGE }}
           committer: innovitech-robot
           author: innovitech-robot
-          branch:  ${{ steps.bumpbranch.outputs.BRANCH_NAME }}
+          branch:  ${{ steps.bumpbranch.outputs.MR_BRANCH_NAME }}
           delete-branch: true
           title: ${{ steps.bumpbranch.outputs.COMMIT_MESSAGE }}
 
