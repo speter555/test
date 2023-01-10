@@ -115,7 +115,7 @@ jobs:
           
           git checkout -b ${RELEASE_BRANCH_NAME} main
           echo new release branch name is ${RELEASE_BRANCH_NAME}
-          MR_BRANCH_NAME=feature/${{steps.preset.outputs.SCM_TAG}}-release
+          MR_BRANCH_NAME=feature/${SCM_TAG}-release
           echo "MR_BRANCH_NAME=${MR_BRANCH_NAME}"
           echo "MR_BRANCH_NAME=${MR_BRANCH_NAME}" >> $GITHUB_OUTPUT
 
