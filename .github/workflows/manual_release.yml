@@ -98,9 +98,11 @@ jobs:
 
       - name: Maven release prepare DryRun and release branch
         id: preset
+        shell: bash
         run: |
           mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml  release:prepare -DdryRun=true -Dgpg.keyname=$GPG_KEY_ID_GITHUB_TECHUSER
-          echo SCM_TAG=`cat release.properties | grep -w "scm.tag" | cut -d'=' -f2`
+          SCM_TAG=`cat release.properties | grep -w "scm.tag" | cut -d'=' -f2`
+          echo SCM_TAG=${SCM_TAG}
           mvn -B release:clean --file pom.xml
           echo RELEASE_BRANCH_NAME=release/${SCM_TAG%.*}.x
           git checkout -b $RELEASE_BRANCH_NAME origin/main
