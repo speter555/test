@@ -174,3 +174,21 @@ jobs:
           committer: InnovITech Kft. - Github technical user <github-techuser@innovitech.hu>
           author: InnovITech Kft. - Github technical user <github-techuser@innovitech.hu>
           base: main
+
+  after_release_job:
+    need: release_job
+
+    steps:
+      - name: Setup node 16
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: createReleaseNotes
+        env:
+          GREN_GITHUB_TOKEN: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
+        run: |
+          cd .github
+          npm install github-release-notes -g
+          gren release --token=$GREN_GITHUB_TOKEN
+          
