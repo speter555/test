@@ -133,9 +133,9 @@ jobs:
       - name: Maven release PREPARE
         run: |
           mvn -B release:prepare
-  #
-  #    - name: Maven release PERFORM
-      #      run: mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml  release:perform
+
+      - name: Maven release PERFORM
+        run: mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml  release:perform
 
       - name: Setup node 16
         uses: actions/setup-node@v3
