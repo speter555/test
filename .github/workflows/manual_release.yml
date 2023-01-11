@@ -159,10 +159,9 @@ jobs:
         env:
           GREN_GITHUB_TOKEN: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
         run: |
-          cd .github
           npm install github-release-notes -g
-          gren release  --tags=${{steps.preset.outputs.SCM_TAG}} --token=$GREN_GITHUB_TOKEN --config=$GITHUB_WORKSPACE/.github/.grenrc.json
-          gren changelog --generate --changelog-filename=CHANGELOG.md  --tags=${{steps.preset.outputs.SCM_TAG}} --token=$GREN_GITHUB_TOKEN --config=$GITHUB_WORKSPACE/.github/.grenrc.json
+          gren release --tags=${{steps.preset.outputs.SCM_TAG}} --token=$GREN_GITHUB_TOKEN --config="./.github/.grenrc.json"
+          gren changelog --generate --changelog-filename=CHANGELOG.md --tags=${{steps.preset.outputs.SCM_TAG}} --token=$GREN_GITHUB_TOKEN --config=$GITHUB_WORKSPACE/.github/.grenrc.json
           git push
 
       - name: Checkout main
