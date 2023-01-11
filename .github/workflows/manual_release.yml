@@ -178,6 +178,8 @@ jobs:
   after_release_job:
     needs: release_job
 
+    runs-on: ubuntu-latest
+
     steps:
       - name: Setup node 16
         uses: actions/setup-node@v3
