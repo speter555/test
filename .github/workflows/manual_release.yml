@@ -187,3 +187,4 @@ jobs:
           committer: ${env.TECH_USER_USERNAME} <${env.TECH_USER_EMAIL}>
           author: ${env.TECH_USER_USERNAME} <${env.TECH_USER_EMAIL}>
           base: main
+          delete-branch: true
