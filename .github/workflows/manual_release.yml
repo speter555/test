@@ -179,3 +179,12 @@ jobs:
           git push
           echo next version on main is $TARGET_BRANCH_NEXT_VERSION
 
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v4
+        with:
+          token: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
+          commit-message: ${{steps.preset.outputs.COMMIT_MESSAGE}}
+          branch:  ${{steps.preset.outputs.MR_BRANCH_NAME}}
+          title: ${{steps.preset.outputs.COMMIT_MESSAGE}}
+          committer: InnovITech Kft. - Github technical user <github-techuser@innovitech.hu>
+          author: InnovITech Kft. - Github technical user <github-techuser@innovitech.hu>
