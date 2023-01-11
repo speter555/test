@@ -20,6 +20,10 @@ env:
   NEXUS_USER: '${{ secrets.NEXUS_USER }}'
   NEXUS_PASSWORD: '${{ secrets.NEXUS_PASSWORD }}'
   GPG_KEY_ID_GITHUB_TECHUSER: '${{ secrets.GPG_KEY_ID_GITHUB_TECHUSER }}'
+  TECH_USER_USERNAME: 'innovitech-robot'
+  TECH_USER_EMAIL: 'github-techuser@innovitech.hu'
+  JAVA_VERSION: '17'
+  JAVA_DISTRIBUTION: 'temurin'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -51,15 +55,12 @@ jobs:
     steps:
 
       - name: Import GPG key
-        env:
-          # GPG privat kulcs, ami armor-al exportalva (kezdete: '-----BEGIN PGP PRIVATE KEY BLOCK-----') ez az egesz tartalom base64 elkodolva, az betoltve a secrets tartalomnak
-          GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY_GITHUB_TECHUSER }}
+        # GPG privat kulcs, ami armor-al exportalva (kezdete: '-----BEGIN PGP PRIVATE KEY BLOCK-----') ez az egesz tartalom base64 elkodolva, az betoltve a secrets tartalomnak
         # dekodoljuk a base64 elkodolt privat kulcsot es betoltjuk
         run: |
           mkdir -p ~/.gnupg/
-          echo "$GPG_SIGNING_KEY" | base64 --decode > ~/.gnupg/private.key
+          echo "${{ secrets.GPG_SIGNING_KEY_GITHUB_TECHUSER }}" | base64 --decode > ~/.gnupg/private.key
           gpg --import ~/.gnupg/private.key
-
 
       - name: Install SSH key
         uses: shimataro/ssh-key-action@v2
@@ -71,13 +72,10 @@ jobs:
           # config: ${{ secrets.CONFIG }} # ssh_config; optional
 
       - name: Configure GIT for signed commit
-        env:
-          # GPG kulcs azonositoja
-          GPG_KEY_ID_GITHUB_TECHUSER: ${{ secrets.GPG_KEY_ID_GITHUB_TECHUSER }}
         run: |
-          git config --global user.name "innovitech-robot"
-          git config --global user.email "github-techuser@innovitech.hu"
-          git config --global user.signingkey "$GPG_KEY_ID_GITHUB_TECHUSER"
+          git config --global user.name "${env.TECH_USER_USERNAME}"
+          git config --global user.email "${env.TECH_USER_EMAIL}"
+          git config --global user.signingkey "${{ secrets.GPG_KEY_ID_GITHUB_TECHUSER }}"
           git config --global commit.gpgsign true
           git config --global tag.gpgSign true
 
@@ -92,8 +90,8 @@ jobs:
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
-          java-version: 17
-          distribution: 'temurin'
+          java-version: ${env.JAVA_VERSION}
+          distribution: ${env.DISTRIBUTION}
           cache: 'maven'
 
       - name: Maven release prepare DryRun and release branch
@@ -135,9 +133,9 @@ jobs:
       - name: Maven release PREPARE
         run: |
           mvn -B release:prepare
-  #
-  #    - name: Maven release PERFORM
-      #      run: mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml  release:perform
+
+      - name: Maven release PERFORM
+        run: mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml  release:perform
 
       - name: Setup node 16
         uses: actions/setup-node@v3
@@ -152,6 +150,7 @@ jobs:
           npm install github-release-notes -g
           gren release --token=$GREN_GITHUB_TOKEN
           gren changelog --token=$GREN_GITHUB_TOKEN
+          git push
 
       - name: Checkout main
         uses: actions/checkout@v3
@@ -177,6 +176,7 @@ jobs:
           git commit -a -m "$COMMIT_MESSAGE"
           echo next version on main is $TARGET_BRANCH_NEXT_VERSION
 
+      # Ez a step az előzőeket pusholja a branch-be megadott branchre, és az mr-t a base-re írja ki.
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4.2.3
         with:
@@ -184,8 +184,7 @@ jobs:
           commit-message: ${{steps.bumpbranch.outputs.COMMIT_MESSAGE}}
           branch:  ${{steps.preset.outputs.MR_BRANCH_NAME}}
           title: ${{steps.bumpbranch.outputs.COMMIT_MESSAGE}}
-          committer: InnovITech Kft. - Github technical user <github-techuser@innovitech.hu>
-          author: InnovITech Kft. - Github technical user <github-techuser@innovitech.hu>
+          committer: ${env.TECH_USER_USERNAME} <${env.TECH_USER_EMAIL}>
+          author: ${env.TECH_USER_USERNAME} <${env.TECH_USER_EMAIL}>
           base: main
-
-          
+          delete-branch: true

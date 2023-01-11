@@ -12,7 +12,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <project.scm.id>innovitech-git-server</project.scm.id>
+        <project.scm.id>github</project.scm.id>
     </properties>
 
     <scm>
@@ -20,5 +20,13 @@
         <developerConnection>scm:git:https://github.com/speter555/test.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/octocat/hello-world</url>
+        </repository>
+    </distributionManagement>
 
 </project>
