@@ -43,6 +43,13 @@ jobs:
           echo "github.event.ref: ${{ github.event.ref }}"
           echo "github.repository: ${{ github.repository }}"
           echo "github.workspace: ${{ github.workspace }}"
+          echo "NEXUS_USER: '${{ env.NEXUS_USER }}'
+          echo "NEXUS_PASSWORD: '${{ env.NEXUS_PASSWORD }}'
+          echo "GPG_KEY_ID_GITHUB_TECHUSER: '${{ env.GPG_KEY_ID_GITHUB_TECHUSER }}'"
+          echo "TECH_USER_USERNAME: '${{ env.TECH_USER_USERNAME }}'"
+          echo "TECH_USER_EMAIL: '${{ env.TECH_USER_EMAIL }}'"
+          echo "JAVA_VERSION: '${{ env.JAVA_VERSION }}'"
+          echo "JAVA_DISTRIBUTION: '${{ env.JAVA_DISTRIBUTION }}'"
 
   release_job:
     name: Maven release
@@ -73,8 +80,8 @@ jobs:
 
       - name: Configure GIT for signed commit
         run: |
-          git config --global user.name "${TECH_USER_USERNAME}"
-          git config --global user.email "${TECH_USER_EMAIL}"
+          git config --global user.name "${{ env.TECH_USER_USERNAME }}"
+          git config --global user.email "${{ env.TECH_USER_EMAIL }}"
           git config --global user.signingkey "${{ secrets.GPG_KEY_ID_GITHUB_TECHUSER }}"
           git config --global commit.gpgsign true
           git config --global tag.gpgSign true
@@ -90,8 +97,8 @@ jobs:
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
-          java-version: ${JAVA_VERSION}
-          distribution: ${JAVA_DISTRIBUTION}
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
           cache: 'maven'
 
       - name: Maven release prepare DryRun and release branch
@@ -184,7 +191,7 @@ jobs:
           commit-message: ${{steps.bumpbranch.outputs.COMMIT_MESSAGE}}
           branch:  ${{steps.preset.outputs.MR_BRANCH_NAME}}
           title: ${{steps.bumpbranch.outputs.COMMIT_MESSAGE}}
-          committer: ${TECH_USER_USERNAME} <${TECH_USER_EMAIL}>
-          author: ${TECH_USER_USERNAME} <${TECH_USER_EMAIL}>
+          committer: ${{ env.TECH_USER_USERNAME }} <${{ env.TECH_USER_EMAIL }}>
+          author: ${{ env.TECH_USER_USERNAME }} <${{ env.TECH_USER_EMAIL }}>
           base: main
           delete-branch: true
