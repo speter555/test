@@ -176,7 +176,6 @@ jobs:
           
           git add .
           git commit -a -m "$COMMIT_MESSAGE"
-          git push
           echo next version on main is $TARGET_BRANCH_NEXT_VERSION
 
       - name: Create Pull Request
