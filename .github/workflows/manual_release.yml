@@ -176,7 +176,7 @@ jobs:
           base: main
 
   after_release_job:
-    need: release_job
+    needs: release_job
 
     steps:
       - name: Setup node 16
