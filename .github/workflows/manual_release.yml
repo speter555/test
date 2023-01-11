@@ -184,8 +184,7 @@ jobs:
         with:
           token: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
           commit-message: ${{steps.preset.outputs.COMMIT_MESSAGE}}
-          branch:  ${{steps.preset.outputs.MR_BRANCH_NAME}}
+          branch:  main
           title: ${{steps.preset.outputs.COMMIT_MESSAGE}}
           committer: InnovITech Kft. - Github technical user <github-techuser@innovitech.hu>
           author: InnovITech Kft. - Github technical user <github-techuser@innovitech.hu>
-          base: main
