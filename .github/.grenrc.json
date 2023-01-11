@@ -1,7 +1,6 @@
 {
   "debug": true,
-  "override": true,
-  "tags": "all",
+  "override": false,
   "include-messages" : "all",
   "changelogFilename": "CHANGELOG.md",
   "generate": true,
