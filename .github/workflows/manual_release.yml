@@ -139,6 +139,18 @@ jobs:
   #    - name: Maven release PERFORM
       #      run: mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml  release:perform
 
+      - name: Setup node 16
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: createReleaseNotes
+        env:
+          GREN_GITHUB_TOKEN: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
+        run: |
+          cd .github
+          npm install github-release-notes -g
+          gren release --token=$GREN_GITHUB_TOKEN
 
       - name: Checkout main
         uses: actions/checkout@v3
@@ -175,22 +187,4 @@ jobs:
           author: InnovITech Kft. - Github technical user <github-techuser@innovitech.hu>
           base: main
 
-  after_release_job:
-    needs: release_job
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Setup node 16
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-
-      - name: createReleaseNotes
-        env:
-          GREN_GITHUB_TOKEN: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
-        run: |
-          cd .github
-          npm install github-release-notes -g
-          gren release --token=$GREN_GITHUB_TOKEN
           
