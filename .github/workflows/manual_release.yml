@@ -147,19 +147,19 @@ jobs:
           token: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
           ref: main
 
-      - name: Create bump version branch
-        id: createbumpbranch
-        shell: bash
-        run: |
-          git checkout -b ${{steps.preset.outputs.MR_BRANCH_NAME}} main
-          git push --set-upstream origin ${{steps.preset.outputs.MR_BRANCH_NAME}}
-
-      - name: Checkout bump version branch
-        uses: actions/checkout@v3
-        with:
-          # Ne az a user legyen aki a workflow-ot inditotta
-          token: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
-          ref: ${{ steps.preset.outputs.MR_BRANCH_NAME }}
+#      - name: Create bump version branch
+#        id: createbumpbranch
+#        shell: bash
+#        run: |
+#          git checkout -b ${{steps.preset.outputs.MR_BRANCH_NAME}} main
+#          git push --set-upstream origin ${{steps.preset.outputs.MR_BRANCH_NAME}}
+#
+#      - name: Checkout bump version branch
+#        uses: actions/checkout@v3
+#        with:
+#          # Ne az a user legyen aki a workflow-ot inditotta
+#          token: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
+#          ref: ${{ steps.preset.outputs.MR_BRANCH_NAME }}
 
       - name: Bump version branch
         id: bumpbranch
@@ -182,9 +182,9 @@ jobs:
         uses: peter-evans/create-pull-request@v4.2.3
         with:
           token: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
-          commit-message: ${{steps.preset.outputs.COMMIT_MESSAGE}}
+          commit-message: ${{steps.bumpbranch.outputs.COMMIT_MESSAGE}}
           branch:  ${{steps.preset.outputs.MR_BRANCH_NAME}}
-          title: ${{steps.preset.outputs.COMMIT_MESSAGE}}
+          title: ${{steps.bumpbranch.outputs.COMMIT_MESSAGE}}
           committer: InnovITech Kft. - Github technical user <github-techuser@innovitech.hu>
           author: InnovITech Kft. - Github technical user <github-techuser@innovitech.hu>
           base: main
