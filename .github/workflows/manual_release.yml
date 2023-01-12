@@ -162,7 +162,8 @@ jobs:
           npm install github-release-notes -g
           cd $GITHUB_WORKSPACE/.github
           gren release --tags=${{steps.preset.outputs.SCM_TAG}} --token=$GREN_GITHUB_TOKEN
-          gren changelog --generate --changelog-filename=CHANGELOG.md --tags=${{steps.preset.outputs.SCM_TAG}} --token=$GREN_GITHUB_TOKEN
+          gren changelog --generate --tags=${{steps.preset.outputs.SCM_TAG}} --token=$GREN_GITHUB_TOKEN
+          git add .
           git push
 
       - name: Checkout main
