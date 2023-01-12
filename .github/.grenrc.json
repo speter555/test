@@ -1,7 +1,7 @@
 {
   "debug": true,
   "override": true,
-  "data-source": "commits|prs|prs-with-issues",
+  "data-source": "prs-with-issues",
   "milestone-match": "{{tag_name}}",
   "include-messages" : "all",
   "changelogFilename": "CHANGELOG.md",
