@@ -8,7 +8,7 @@
 
     <groupId>hu.innovitech.test</groupId>
     <artifactId>test</artifactId>
-    <version>0.13.0</version>
+    <version>0.13.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
@@ -18,7 +18,7 @@
     <scm>
         <connection>scm:git:https://github.com/speter555/test.git</connection>
         <developerConnection>scm:git:https://github.com/speter555/test.git</developerConnection>
-        <tag>test-0.13.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
 </project>
