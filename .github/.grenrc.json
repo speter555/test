@@ -2,7 +2,6 @@
   "debug": true,
   "override": true,
   "data-source": "prs-with-issues",
-  "milestone-match": "{{tag_name}}",
   "include-messages" : "all",
   "changelogFilename": "CHANGELOG.md",
   "generate": true,
