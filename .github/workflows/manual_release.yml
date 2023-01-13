@@ -190,7 +190,7 @@ jobs:
 
       - name: Generate release note
         id: build_changelog
-        uses: mikepenz/release-changelog-builder-action@3.6.0
+        uses: mikepenz/release-changelog-builder-action@v3.6.0
         with:
           token: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
           fromTag: ${{steps.preset.outputs.SCM_TAG}}
