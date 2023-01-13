@@ -1,7 +1,6 @@
 {
   "debug": true,
   "override": false,
-  "data-source": "prs-with-issues",
   "include-messages" : "all",
   "changelogFilename": "CHANGELOG.md",
   "generate": true,
