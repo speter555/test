@@ -150,23 +150,6 @@ jobs:
 #          TOKEN: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
 #        run: mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml  release:perform
 
-      - name: Setup node 16
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-
-      - name: createReleaseNotes
-        env:
-          GREN_GITHUB_TOKEN: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
-        run: |
-          npm install github-release-notes -g
-          cd $GITHUB_WORKSPACE/.github
-          gren release --tags=${{steps.preset.outputs.SCM_TAG}} --token=$GREN_GITHUB_TOKEN --debug=true --override=false --data-soruce=prs-with-issues
-          gren changelog --generate --tags=all --token=$GREN_GITHUB_TOKEN --debug=true --override=true --data-soruce=prs-with-issues
-          git add .
-          git commit -a -m "Add changelog file"
-          git push
-
       - name: Checkout main
         uses: actions/checkout@v3
         with:
@@ -191,6 +174,7 @@ jobs:
           git commit -a -m "$COMMIT_MESSAGE"
           echo next version on main is $TARGET_BRANCH_NEXT_VERSION
 
+
       # Ez a step az előzőeket pusholja a branch-be megadott branchre, és az mr-t a base-re írja ki.
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4.2.3
@@ -203,3 +187,72 @@ jobs:
           author: ${{ env.TECH_USER_USERNAME }} <${{ env.TECH_USER_EMAIL }}>
           base: main
           delete-branch: true
+
+      - name: Generate release note
+        id: build_changelog
+        uses: mikepenz/release-changelog-builder-action@3.6.0
+        with:
+          token: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
+          fromTag: ${{steps.preset.outputs.SCM_TAG}}
+          toTag: ${{steps.preset.outputs.SCM_TAG}}
+          configurationJson: |
+            {
+                "categories": [
+                  {
+                    "title": "## 🚀 Enhancement",
+                    "labels": ["enhancement", "documentation"]
+                  },
+                  {
+                    "title": "## 🚧 Dependencies",
+                    "labels": ["dependencies", "maintenance"]
+                  },
+                  {
+                    "title": "## 🪲 Bug",
+                    "labels": ["bug"]
+                  }
+                ],
+                "ignore_labels": [
+                  "ignore", "invalid", "wontfix"
+                ],
+                "sort": {
+                  "order": "ASC",
+                  "on_property": "mergedAt"
+                },
+                "template": "${{CHANGELOG}}\n\n<details>\n<summary>Uncategorized</summary>\n\n${{UNCATEGORIZED}}\n</details>",
+                "pr_template": "- ${{TITLE}}\n   - PR: #${{NUMBER}}",
+                "empty_template": "- no changes",
+                "label_extractor": [
+                  {
+                    "pattern": "(.) (.+)",
+                    "target": "$1",
+                    "flags": "gu"
+                  },
+                  {
+                    "pattern": "\\[Issue\\]",
+                    "on_property": "title",
+                    "method": "match"
+                  }
+                ],
+                "transformers": [
+                  {
+                    "pattern": "[\\-\\*] (\\[(...|TEST|CI|SKIP)\\])( )?(.+?)\n(.+?[\\-\\*] )(.+)",
+                    "target": "- $4\n  - $6"
+                  }
+                ],
+                "trim_values": false,
+                "max_tags_to_fetch": 200,
+                "max_pull_requests": 200,
+                "max_back_track_time_days": 365,
+                "base_branches": [
+                  "main"
+                ]
+            }
+
+      - name: Create Release
+        uses: mikepenz/action-gh-release@v0.2.0-a03
+        with:
+          tag_name: ${{steps.preset.outputs.SCM_TAG}}
+          token: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
+          body: ${{steps.build_changelog.outputs.changelog}}
+          draft: false
+          prerelease: false
