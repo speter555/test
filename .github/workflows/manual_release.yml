@@ -174,6 +174,22 @@ jobs:
           git commit -a -m "$COMMIT_MESSAGE"
           echo next version on main is $TARGET_BRANCH_NEXT_VERSION
 
+      - name: Generate release note
+        id: build_changelog
+        uses: mikepenz/release-changelog-builder-action@v3.6.0
+        with:
+          token: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
+          fromTag: ${{steps.preset.outputs.SCM_TAG}}
+          toTag: ${{steps.preset.outputs.SCM_TAG}}
+          configuration: ".github/release_config.json"
+
+      - name: Add changelog to changelog.MD
+        shell: bash
+        run: |
+          COMMIT_MESSAGE="Bump version to $TARGET_BRANCH_NEXT_VERSION"
+          echo ${{steps.build_changelog.outputs.changelog}} >> changelog.MD
+          git add changelog.MD
+          git commit -a -m 'Update changelog.MD'
 
       # Ez a step az előzőeket pusholja a branch-be megadott branchre, és az mr-t a base-re írja ki.
       - name: Create Pull Request
@@ -187,15 +203,6 @@ jobs:
           author: ${{ env.TECH_USER_USERNAME }} <${{ env.TECH_USER_EMAIL }}>
           base: main
           delete-branch: true
-
-      - name: Generate release note
-        id: build_changelog
-        uses: mikepenz/release-changelog-builder-action@v3.6.0
-        with:
-          token: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
-          fromTag: ${{steps.preset.outputs.SCM_TAG}}
-          toTag: ${{steps.preset.outputs.SCM_TAG}}
-          configuration: ".github/release_config.json"
 
       - name: Create Release
         uses: mikepenz/action-gh-release@v0.2.0-a03
