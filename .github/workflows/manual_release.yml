@@ -161,9 +161,10 @@ jobs:
         run: |
           npm install github-release-notes -g
           cd $GITHUB_WORKSPACE/.github
-          gren release --tags=all --token=$GREN_GITHUB_TOKEN
-          gren changelog --generate --override --tags=${{steps.preset.outputs.SCM_TAG}} --token=$GREN_GITHUB_TOKEN
+          gren release --tags=${{steps.preset.outputs.SCM_TAG}} --token=$GREN_GITHUB_TOKEN --debug=true --override=false --data-soruce=prs-with-issues
+          gren changelog --generate --tags=all --token=$GREN_GITHUB_TOKEN --debug=true --override=true --data-soruce=prs-with-issues
           git add .
+          git commit -a -m "Add changelog file"
           git push
 
       - name: Checkout main

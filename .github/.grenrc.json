@@ -1,9 +1,4 @@
 {
-  "debug": true,
-  "override": false,
-  "include-messages" : "all",
-  "changelogFilename": "CHANGELOG.md",
-  "generate": true,
   "groupBy": {
     "Enhancements:": ["enhancement", "documentation", "dependencies"],
     "Bug Fixes:": ["bug"]
