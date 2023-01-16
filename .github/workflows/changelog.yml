@@ -69,8 +69,8 @@ jobs:
         with:
           token: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
           configuration: ".github/release_config.json"
-          fromTag: "test-0.21.0"
-          toTag: "test-0.22.0"
+          fromTag: "test-0.19.0"
+          toTag: "test-0.20.0"
 
       - name: Add changelog to changelog.MD
         shell: bash
