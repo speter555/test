@@ -62,10 +62,6 @@ jobs:
 
       - name: Checkout main
         uses: actions/checkout@v3
-        with:
-          # Ne az a user legyen aki a workflow-ot inditotta
-          token: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
-          ref: refs/tags/test-0.22.0
 
       - name: Generate release note
         id: build_changelog
@@ -73,6 +69,8 @@ jobs:
         with:
           token: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
           configuration: ".github/release_config.json"
+          fromTag: "test-0.21.0"
+          toTag: "test-0.22.0"
 
       - name: Add changelog to changelog.MD
         shell: bash
