@@ -1,0 +1,103 @@
+
+name: Changelog generation
+
+on:
+  workflow_dispatch:
+
+env:
+  TECH_USER_USERNAME: 'innovitech-robot'
+  TECH_USER_EMAIL: 'github-techuser@innovitech.hu'
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  print_params:
+    name: Print parameters
+
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+
+      # Runs a single command using the runners shell
+      - name: Print
+        run: |
+          echo "github.event.inputs.comment ${{ github.event.inputs.comment }}"
+          echo "github.ref: ${{ github.ref }}"
+          echo "github.event.ref: ${{ github.event.ref }}"
+          echo "github.repository: ${{ github.repository }}"
+          echo "github.workspace: ${{ github.workspace }}"
+          echo "TECH_USER_USERNAME: '${{ env.TECH_USER_USERNAME }}'"
+          echo "TECH_USER_EMAIL: '${{ env.TECH_USER_EMAIL }}'"
+
+  changelog_job:
+    name: Generate changelog
+
+    if: contains('["speter555"]', github.actor)
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Import GPG key
+        run: |
+          mkdir -p ~/.gnupg/
+          echo "${{ secrets.GPG_SIGNING_KEY_GITHUB_TECHUSER }}" | base64 --decode > ~/.gnupg/private.key
+          gpg --import ~/.gnupg/private.key
+
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          # A tartalma egy PEM formatumos (kezdete: '-----BEGIN RSA PRIVATE KEY-----') SSH kulcs
+          key: ${{ secrets.SSH_PRIVATE_KEY_GITHUB_TECHUSER }}
+          name: id_rsa # optional
+          known_hosts: ${{ secrets.KNOWN_HOSTS }} # jelenleg ures a tartalma
+
+      - name: Configure GIT for signed commit
+        run: |
+          git config --global user.name "${{ env.TECH_USER_USERNAME }}"
+          git config --global user.email "${{ env.TECH_USER_EMAIL }}"
+          git config --global user.signingkey "${{ secrets.GPG_KEY_ID_GITHUB_TECHUSER }}"
+          git config --global commit.gpgsign true
+          git config --global tag.gpgSign true
+
+      - name: Checkout main
+        uses: actions/checkout@v3
+        with:
+          # Ne az a user legyen aki a workflow-ot inditotta
+          token: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
+          ref: refs/tags/test-0.22.0
+
+      - name: Generate release note
+        id: build_changelog
+        uses: mikepenz/release-changelog-builder-action@v3.6.0
+        with:
+          token: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
+          configuration: ".github/release_config.json"
+
+      - name: Add changelog to changelog.MD
+        shell: bash
+        run: |
+          COMMIT_MESSAGE="Bump version to $TARGET_BRANCH_NEXT_VERSION"
+          echo ${{steps.build_changelog.outputs.changelog}} >> changelog.MD
+          git add .
+          git commit -a -m 'Update changelog.MD'
+
+      # Ez a step az előzőeket pusholja a branch-be megadott branchre, és az mr-t a base-re írja ki.
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v4.2.3
+        with:
+          token: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
+          branch:  'feature/changelog_test'
+          committer: ${{ env.TECH_USER_USERNAME }} <${{ env.TECH_USER_EMAIL }}>
+          author: ${{ env.TECH_USER_USERNAME }} <${{ env.TECH_USER_EMAIL }}>
+          base: main
+          delete-branch: true
+
+      - name: Create Release
+        uses: mikepenz/action-gh-release@v0.2.0-a03
+        with:
+          tag_name: 'test-0.22.0'
+          token: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
+          body: ${{steps.build_changelog.outputs.changelog}}
+          draft: false
+          prerelease: false
