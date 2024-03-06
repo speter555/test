@@ -56,7 +56,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Release
-        uses: speter555/gh-action-mvn-release-main@main
+        uses: speter555/gh-action-mvn-release-main@0.1.0
         with:
           NEXUS_USER: 'speter55}'
           NEXUS_PASSWORD: '${{ secrets.GITHUB_TOKEN }}'
