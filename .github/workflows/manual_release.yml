@@ -142,6 +142,7 @@ jobs:
       - name: Maven release PERFORM
         env:
           USERNAME: ${{ env.TECH_USER_USERNAME }}
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml  release:perform
 
       - name: Checkout main
