@@ -58,7 +58,7 @@ jobs:
       - name: Release
         uses: speter555/gh-action-mvn-release-main@main
         with:
-          NEXUS_USER: '${{ secrets.TECH_USER_USERNAME }}'
+          NEXUS_USER: 'speter55}'
           NEXUS_PASSWORD: '${{ secrets.GITHUB_TOKEN }}'
           ARTIFACT_STORE_SERVER_ID: 'github'
           SETTINGS_XML_PATH: '.github/.m2/settings.xml'
