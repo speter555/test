@@ -171,7 +171,7 @@ jobs:
         id: build_changelog
         uses: mikepenz/release-changelog-builder-action@v3.6.0
         with:
-          token: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
+          #token: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
           configuration: ".github/release_config.json"
 
       - name: Add changelog to changelog.MD
