@@ -26,7 +26,7 @@
         <repository>
             <id>github</id>
             <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/octocat/hello-world</url>
+            <url>https://maven.pkg.github.com/speter555/test</url>
         </repository>
     </distributionManagement>
 
