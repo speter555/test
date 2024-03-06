@@ -56,17 +56,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Release
-        uses: speter555/gh-action-mvn-release-main@gh-action-mvn-release-main-0.3.0
+        uses: speter555/gh-action-mvn-release-main@gh-action-mvn-release-main-0.4.0
         with:
-          NEXUS_USER: 'speter55}'
+          NEXUS_USER: '${{ env.TECH_USER_USERNAME }}'
           NEXUS_PASSWORD: '${{ secrets.GITHUB_TOKEN }}'
           ARTIFACT_STORE_SERVER_ID: 'github'
           SETTINGS_XML_PATH: '.github/.m2/settings.xml'
           GPG_KEY_ID_GITHUB_TECHUSER: '${{ secrets.GPG_KEY_ID_GITHUB_TECHUSER }}'
           GPG_SIGNING_KEY_GITHUB_TECHUSER: '${{ secrets.GPG_SIGNING_KEY_GITHUB_TECHUSER }}'
           SSH_PRIVATE_KEY_GITHUB_TECHUSER: '${{ secrets.SSH_PRIVATE_KEY_GITHUB_TECHUSER }}'
-          TECH_USER_USERNAME: 'innovitech-robot'
-          TECH_USER_EMAIL: 'github-techuser@innovitech.hu'
+          TECH_USER_USERNAME: '${{ env.TECH_USER_USERNAME }}'
+          TECH_USER_EMAIL: '${{ env.TECH_USER_EMAIL }}'
           JAVA_VERSION: '17'
           JAVA_DISTRIBUTION: 'temurin'
 #  release_job:
