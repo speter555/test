@@ -6,13 +6,13 @@
         <version>1.0.0</version>
     </parent>
 
-    <groupId>hu.innovitech.test</groupId>
+    <groupId>hu.speter555.test</groupId>
     <artifactId>test</artifactId>
     <version>0.25.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
-        <project.scm.id>innovitech-git-server</project.scm.id>
+        <project.scm.id>github</project.scm.id>
     </properties>
 
     <scm>

@@ -55,7 +55,7 @@ jobs:
     name: Maven release
 
     # Permission ellenorzes https://github.community/t/who-has-permission-to-workflow-dispatch/133981
-    if: contains('["rombow","speter555"]', github.actor)
+    if: contains('["speter555"]', github.actor)
 
     runs-on: ubuntu-latest
 
@@ -139,11 +139,10 @@ jobs:
         run: |
           mvn -B release:prepare
 
-#      - name: Maven release PERFORM
-#        env:
-#          USERNAME: ${{ env.TECH_USER_USERNAME }}
-#          TOKEN: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
-#        run: mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml  release:perform
+      - name: Maven release PERFORM
+        env:
+          USERNAME: ${{ env.TECH_USER_USERNAME }}
+        run: mvn -B -s $GITHUB_WORKSPACE/.github/.m2/settings.xml  release:perform
 
       - name: Checkout main
         uses: actions/checkout@v4
@@ -167,26 +166,10 @@ jobs:
           git commit -a -m "$COMMIT_MESSAGE"
           echo next version on main is $TARGET_BRANCH_NEXT_VERSION
 
-      - name: Generate release note
-        id: build_changelog
-        uses: mikepenz/release-changelog-builder-action@v3.6.0
-        with:
-          #token: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
-          configuration: ".github/release_config.json"
-
-      - name: Add changelog to changelog.MD
-        shell: bash
-        run: |
-          COMMIT_MESSAGE="Bump version to $TARGET_BRANCH_NEXT_VERSION"
-          echo ${{steps.build_changelog.outputs.changelog}} >> changelog.MD
-          git add changelog.MD
-          git commit -a -m 'Update changelog.MD'
-
       # Ez a step az előzőeket pusholja a branch-be megadott branchre, és az mr-t a base-re írja ki.
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4.2.3
         with:
-          #token: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
           commit-message: ${{steps.bumpbranch.outputs.COMMIT_MESSAGE}}
           branch:  ${{steps.preset.outputs.MR_BRANCH_NAME}}
           title: ${{steps.bumpbranch.outputs.COMMIT_MESSAGE}}
@@ -194,12 +177,3 @@ jobs:
           author: ${{ env.TECH_USER_USERNAME }} <${{ env.TECH_USER_EMAIL }}>
           base: main
           delete-branch: true
-
-      - name: Create Release
-        uses: mikepenz/action-gh-release@v0.2.0-a03
-        with:
-          tag_name: ${{steps.preset.outputs.SCM_TAG}}
-          #token: ${{ secrets.GH_TOKEN_TECHUSER_JAVA }}
-          body: ${{steps.build_changelog.outputs.changelog}}
-          draft: false
-          prerelease: false
