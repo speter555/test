@@ -8,7 +8,7 @@
 
     <groupId>hu.speter555.test</groupId>
     <artifactId>test</artifactId>
-    <version>0.29.0</version>
+    <version>0.29.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
@@ -18,7 +18,7 @@
     <scm>
         <connection>scm:git:https://github.com/speter555/test.git</connection>
         <developerConnection>scm:git:https://github.com/speter555/test.git</developerConnection>
-        <tag>test-0.29.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
 
