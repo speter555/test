@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Release
-        uses: speter555/gh-action-mvn-release-main@v0.20.0
+        uses: speter555/gh-action-mvn-release-main@v0.22.0
         with:
           ARTIFACT_STORE_SERVER_ID: 'github'
           SETTINGS_XML_PATH: '.github/.m2/settings.xml'
