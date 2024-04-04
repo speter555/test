@@ -24,48 +24,20 @@ env:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  print_params:
-    name: Print parameters
-
-    runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-
-      # Runs a single command using the runners shell
-      - name: Print
-        run: |
-          echo "github.event.inputs.comment '${{ github.event.inputs.comment }}'"
-          echo "github.ref: '${{ github.ref }}'"
-          echo "github.event.ref: '${{ github.event.ref }}'"
-          echo "github.repository: '${{ github.repository }}'"
-          echo "github.workspace: '${{ github.workspace }}'"
-          echo "NEXUS_USER: '${{ secrets.TECH_USER_USERNAME }}'"
-          echo "NEXUS_PASSWORD: '${{ secrets.GITHUB_TOKEN }}'"
-          echo "ARTIFACT_STORE_SERVER_ID: 'github'"
-          echo "SETTINGS_XML_PATH: '.github/.m2/settings.xml'"
-          echo "GPG_KEY_ID_GITHUB_TECHUSER: '${{ secrets.GPG_KEY_ID_GITHUB_TECHUSER }}'"
-          echo "GPG_SIGNING_KEY_GITHUB_TECHUSER: '${{ secrets.GPG_SIGNING_KEY_GITHUB_TECHUSER }}'"
-          echo "SSH_PRIVATE_KEY_GITHUB_TECHUSER: '${{ secrets.SSH_PRIVATE_KEY_GITHUB_TECHUSER }}'"
-          echo "TECH_USER_USERNAME: '${{ env.TECH_USER_USERNAME }}'"
-          echo "TECH_USER_EMAIL: '${{ env.TECH_USER_EMAIL }}'"
-          echo "JAVA_VERSION: '${{ env.JAVA_VERSION }}'"
-          echo "JAVA_DISTRIBUTION: '${{ env.JAVA_DISTRIBUTION }}"
 
   mvn-release-main:
     runs-on: ubuntu-latest
     steps:
       - name: Release
-        uses: speter555/gh-action-mvn-release-main@gh-action-mvn-release-main-0.14.0
+        uses: speter555/gh-action-mvn-release-main@v0.16.0
         with:
-          NEXUS_USER: '${{ env.TECH_USER_USERNAME }}'
-          NEXUS_PASSWORD: '${{ secrets.GITHUB_TOKEN }}'
           ARTIFACT_STORE_SERVER_ID: 'github'
           SETTINGS_XML_PATH: '.github/.m2/settings.xml'
           GPG_KEY_ID_GITHUB_TECHUSER: '${{ secrets.GPG_KEY_ID_GITHUB_TECHUSER }}'
           GPG_SIGNING_KEY_GITHUB_TECHUSER: '${{ secrets.GPG_SIGNING_KEY_GITHUB_TECHUSER }}'
           SSH_PRIVATE_KEY_GITHUB_TECHUSER: '${{ secrets.SSH_PRIVATE_KEY_GITHUB_TECHUSER }}'
           TECH_USER_USERNAME: '${{ env.TECH_USER_USERNAME }}'
+          TECH_USER_PASSWORD: '${{ secrets.GITHUB_TOKEN }}'
           TECH_USER_EMAIL: '${{ env.TECH_USER_EMAIL }}'
           JAVA_VERSION: '17'
           JAVA_DISTRIBUTION: 'temurin'
